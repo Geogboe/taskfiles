@@ -1,0 +1,29 @@
+---
+# Docs: https://taskfile.dev/#/
+
+version: "3"
+tasks:
+  docker:run:
+    desc: Via WSL, runs a docker container interactively and mount the current working directory
+    vars:
+      PROJECT_NAME: "{{osBase .USER_WORKING_DIR}}"
+      VOL_MOUNT: "\\${PWD}:/{{.PROJECT_NAME}}"
+      WORKING_DIR: /{{.PROJECT_NAME}}
+      IMAGE_NAME: '{{ default "mcr.microsoft.com/windows/servercore:ltsc2022" .IMAGE }}'
+    cmds:
+      - wsl docker run --rm -it -v "{{.VOL_MOUNT}}" -w "{{.WORKING_DIR}}" {{.DOCKER_ARGS}} {{.IMAGE_NAME}} {{.CLI_ARGS}}
+    interactive: true
+
+  docker:run:nodejs:
+    desc: Via WSL, run an interactive docker container with NodeJS
+    vars:
+      PROJECT_NAME: "{{osBase .USER_WORKING_DIR}}"
+      WORKING_DIR: /{{.PROJECT_NAME}}
+    cmds:
+      # - wsl docker run --rm -it -v "{{.VOL_MOUNT}}" -w "{{.WORKING_DIR}}" {{.DOCKER_ARGS}} node bash
+      # - wsl pwd
+      # - wsl docker run --rm -it -v "\${PWD}:/{{.PROJECT_NAME}}" -w "{{.WORKING_DIR}}" {{.DOCKER_ARGS}} node bash
+      # - wsl --cd \${PWD} echo pwd docker run --rm -it -v \${PWD}:/foo -w /foo {{.DOCKER_ARGS}} node bash
+      - wsl --cd "{{.USER_WORKING_DIR}}"
+        docker run --rm -it -v \$PWD:/{{.PROJECT_NAME}} -w "{{.WORKING_DIR}}" {{.DOCKER_ARGS}} node bash
+    interactive: true
