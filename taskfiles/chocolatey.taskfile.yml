@@ -1,0 +1,20 @@
+---
+# Docs: https://taskfile.dev/#/
+
+version: "3"
+
+tasks:
+  pack:
+    desc: Run chocolatey pack command
+    dir: "{{.USER_WORKING_DIR}}"
+    preconditions:
+      - sh: test -f ./*.nuspec
+        msg: No nuspec file found in current working directory
+    cmds:
+      - choco pack --limit-output {{.CLI_ARGS}}
+    sources:
+      - ./*.nuspec
+      - ./tools/**/*
+    generates:
+      - ./*.nupkg
+    run: once
